@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+$ENV{'PATH'} = '/bin:/usr/bin';
+
+# Set the port number.
+$port = 9002;
+
+system("rm -f /opt/exodus/coder/bin/exodus.pid");
+chdir("/opt/exodus/coder/area");
+
+# Set limits.
+if ( -e "shutdown.txt" ) { system("rm -f shutdown.txt");}
+
+# If you want to have logs in a different directory,
+#   change the 'set logfile' line to reflect the directory name.
+$index = 1000;
+
+while (1) {
+
+while ( 1 ){
+   $logfile = "/opt/exodus/coder/log/$index.log";
+   if ( ! (-e $logfile) ) {last;}
+   $index++;
+}
+
+
+# Run Exodus.
+#Redirect sdterr to the log file
+open (STDERR, ">$logfile");
+
+system("/opt/exodus/coder/bin/exodus-live $port");
+close (STDERR);
+
+#restart the mud
+
+if ( -e "shutdown.txt" ) {
+        system("rm -f shutdown.txt");
+        exit;
+    }
+    sleep(15);
+    system("rm -f /opt/exodus/coder/bin/exodus.pid");
+}
+
+
